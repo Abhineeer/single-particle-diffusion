@@ -73,11 +73,18 @@ X_grid, Y_grid = np.meshgrid(x_vals, y_vals)
 
 # --------- TIMES (Changeable) ---------------
 times = [0.01, 0.05, 0.1, 0.5]
+t_vals = np.linspace(0.001, 5, 100)
+
+def S(t, eigenvalues, h, D):
+    Z = P(X_grid, Y_grid, t, eigenvalues, h, D)
+    result = np.trapezoid(np.trapezoid(Z, x_vals, axis=1), y_vals)
+    return result
 
 fig, axes = plt.subplots(2, 2, figsize=(10, 8))
 
 for i, t in enumerate(times):
     Z = P(X_grid, Y_grid, times[i], eigenvalues, h, D)
+    # print(S(times[i], eigenvalues, h, D))
     ax = axes[i//2, i%2]
     ax.imshow(Z, cmap='viridis', extent=[0,1,0,1], origin='lower')
     ax.set_title(f't = {t}')
@@ -90,4 +97,23 @@ for i, t in enumerate(times):
     # plt.ylabel('y')
 
 plt.tight_layout()
+plt.show()
+
+S_vals = []
+
+for i, t in enumerate(t_vals):
+    S_vals.append(S(t_vals[i], eigenvalues, h, D))
+
+J_vals = -np.gradient(S_vals, t_vals)
+
+plt.plot(t_vals, S_vals)
+plt.xlabel('t')
+plt.ylabel('S')
+plt.title('Survival Probability')
+plt.show()
+
+plt.plot(t_vals, J_vals)
+plt.xlabel('t')
+plt.ylabel('J')
+plt.title('Absorption Flux')
 plt.show()
